@@ -1,51 +1,44 @@
-#!/bin/sh
-
-## Set environment paths
-export PATH=$PATH:/usr/local/go/bin
-export GOPATH=$HOME/go
-mkdir -p $GOPATH/src
-
-### Update System and install dependencies
-apt-get update
-apt-get -y install build-essential libgflags-dev libsnappy-dev zlib1g-dev libbz2-dev liblz4-dev git
-
-
-### Install go
-echo "########################"
-echo "Installing go"
-echo "########################"
-cd ~
-wget https://dl.google.com/go/go1.10.3.linux-amd64.tar.gz
-tar -C /usr/local -xzf go1.10.3.linux-amd64.tar.gz
-chmod +x /usr/local/go/bin/go
-rm go1.10.3.linux-amd64.tar.gz
-
 
 ### Install dep
 echo "########################"
-echo "Installing dep"
+echo "Installing depedencies"
 echo "########################"
-cd /usr/local/bin/
-wget https://github.com/golang/dep/releases/download/v0.4.1/dep-linux-amd64
-ln -s dep-linux-amd64 dep
-chmod +x /usr/local/bin/*
+### Update System and install dependencies
+sudo apt-get -y update
+sudo apt-get -y upgrade
+sudo apt-get -y dist-upgrade
+sudo apt-get -y install wget nano git unrar unzip
+
+### Install Firewall
+echo "########################"
+echo "Installing Firewall"
+echo "########################"
+sudo ufw allow 22/tcp
+sudo ufw limit 22/tcp
+sudo ufw allow 21212/tcp
+sudo ufw logging on
+sudo ufw --force enable
+sudo ufw status
 
 
-### Install VeChain
-echo "########################"
-echo "Installing VeChain"
-echo "########################"
-git clone https://github.com/vechain/thor.git $GOPATH/src/VeChain/thor
-cd $GOPATH/src/VeChain/thor
-dep ensure
-make all
 
-### Create StartUp-Scrip
+### Install PZDC
 echo "########################"
-echo "Creating Startup Script"
+echo "Installing PZDC"
+echo "########################"
+sudo mkdir pzdc
+cd pzdc
+sudo wget https://github.com/pzdc-crypto/pzdc/releases/download/v1.1.0.6/pzdcd-linux64
+sudo wget https://github.com/pzdc-crypto/pzdc/releases/download/v1.1.0.6/pzdc-cli-linux64
+mv ./pzdcd-linux64 pzdcd
+mv ./pzdcd-cli-linux64 pzdc-cli
+chmod +x p*
+
+### Install temp config
+echo "########################"
+echo "Create temporary PZDC config"
 echo "########################"
 cd ~
-echo '#!/bin/bash' >> ./vechain-testnet.sh
-echo "cd"  >> ./vechain-testnet.sh
-echo "$GOPATH/src/VeChain/thor/bin/thor -network test" >> ./vechain-testnet.sh
-chmod +x ./vechain-testnet.sh
+mkdir .pzdc
+nano pzdc.conf
+
